@@ -122,69 +122,91 @@ def depthFirstSearch(problem):
     print("Start: ", problem.getStartState())
     #print("Is the start a goal? ", problem.isGoalState(problem.getStartState()))
 
-    path, isPath, visited = dfsHelper2(problem, problem.getStartState())
-    path.reverse()
-    print(path)
+    path, isPath = dfsHelper(problem, problem.getStartState())
+    #path.reverse()
     return path
 
-def dfsHelper(problem, state, visited = set(), fringe = util.Stack() ):
-    # problem.expand --> returns [(child, action, stepCost)]
-    #from game import 
-    # from pacman import GameState
-    # walls = GameState.getWalls()
+## DFS Helper, does the work of DFS
 
+def dfsHelper(problem, state):
     curr = state
+    visited = set()
+    fringe = util.Stack()
     visited.add(curr)
-    #print("Start: ", curr)
     if problem.isGoalState(curr):
         return [], True
-    else:
+    
+    children = problem.expand(curr)
+    for i in children:
+        if i[0] not in visited:
+            fringe.push([i[0], [i[1]]])
+            visited.add(i[0])
+    
+    while not fringe.isEmpty():
+        curr, path = fringe.pop()
+        if problem.isGoalState(curr):
+            return path, True
         children = problem.expand(curr)
         for i in children:
             if i[0] not in visited:
-                fringe.push(i)
-        action = fringe.pop()
-        #print(action)
-        next = problem.getNextState(curr, action[1])
-        path, isPath = dfsHelper(problem, next, visited, fringe)
-        visited.add(next)
-        #print("Next: ", curr)
-        if isPath:
-            #print("Found path")
-            path.append(action[1])
-            return path, isPath    
-        else:
-            isPath = False
-            return [], isPath
-
-def dfsHelper2(problem, state, visited = set()):
-    curr = state
-    print("Curr ", curr)
-    visited.add(curr)
-    if problem.isGoalState(curr):
-        return [], True, visited
-    else:
-        children = problem.expand(curr)
-        nextup = []
-        for i in children:
-            if i[0] not in visited:
-                nextup.append(i)
+                fringe.push((i[0], path + [i[1]]))
                 visited.add(i[0])
-        for  i in nextup:
-            next = problem.getNextState(curr, i[1])
-            print("Action: ", i)
-            path, ispath, visited = dfsHelper2(problem, next, visited)
-            if ispath:
-                path.append(i[1])
-                return path, ispath, visited
-        return [], False, visited
+    
+    return [], False
 
-
+##recursive dfs without using stack. This is less generalizable 
+# def dfsHelper2(problem, state, visited = set()):#
+#     curr = state
+#     visited.add(curr)
+#     if problem.isGoalState(curr):
+#         return [], True, visited
+#     else:
+#         children = problem.expand(curr)
+#         nextup = []
+#         for i in children:
+#             if i[0] not in visited:
+#                 nextup.append(i)
+#                 visited.add(i[0])
+#         for  i in nextup:
+#             next = problem.getNextState(curr, i[1])
+#             path, ispath, visited = dfsHelper2(problem, next, visited)
+#             if ispath:
+#                 path.append(i[1])
+#                 return path, ispath, visited
+#         return [], False, visited
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    path, isPath = bfsHelper(problem, problem.getStartState())
+    return path
+
+#BFS helper function to do work of bfs
+def bfsHelper(problem, state):
+    curr = state
+    visited = set()
+    fringe = util.Queue()
+    visited.add(curr)
+    if problem.isGoalState(curr):
+        return [], True
+    
+    children = problem.expand(curr)
+    for i in children:
+        if i[0] not in visited:
+            fringe.push([i[0], [i[1]]])
+            visited.add(i[0])
+    
+    while not fringe.isEmpty():
+        curr, path = fringe.pop()
+        if problem.isGoalState(curr):
+            return path, True
+        children = problem.expand(curr)
+        for i in children:
+            if i[0] not in visited:
+                fringe.push((i[0], path + [i[1]]))
+                visited.add(i[0])
+    
+    return [], False
 
 def nullHeuristic(state, problem=None):
     """
@@ -196,8 +218,35 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    path, isPath = aStarHelper(problem, problem.getStartState(), heuristic)
+    return path
 
+#Astar helper does work of A* search
+def aStarHelper(problem, state, h):
+    curr = state
+    visited = set()
+    fringe = util.PriorityQueue()
+    visited.add(curr)
+    if problem.isGoalState(curr):
+        return [], True
+    
+    children = problem.expand(curr)
+    for i in children:
+        if i[0] not in visited:
+            fringe.push((i[0], [i[1]]), h(curr, problem))
+            visited.add(i[0])
+    
+    while not fringe.isEmpty():
+        curr, path = fringe.pop()
+        if problem.isGoalState(curr):
+            return path, True
+        children = problem.expand(curr)
+        for i in children:
+            if i[0] not in visited:
+                fringe.push((i[0], path + [i[1]]), len(path) + h(curr, problem))
+                visited.add(i[0])
+    
+    return [], False
 
 # Abbreviations
 bfs = breadthFirstSearch
