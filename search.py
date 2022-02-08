@@ -11,12 +11,12 @@
 # Student side autograding was added by Brad Miller, Nick Hay, and
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
-
 """
 In search.py, you will implement generic search algorithms which are called by
 Pacman agents (in searchAgents.py).
 """
 
+from sre_parse import State
 import util
 
 class SearchProblem:
@@ -114,7 +114,72 @@ def depthFirstSearch(problem):
     print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    from game import Directions
+    n = Directions.NORTH
+    s = Directions.SOUTH
+    w = Directions.WEST
+    e = Directions.EAST
+    print("Start: ", problem.getStartState())
+    #print("Is the start a goal? ", problem.isGoalState(problem.getStartState()))
+
+    path, isPath, visited = dfsHelper2(problem, problem.getStartState())
+    path.reverse()
+    print(path)
+    return path
+
+def dfsHelper(problem, state, visited = set(), fringe = util.Stack() ):
+    # problem.expand --> returns [(child, action, stepCost)]
+    #from game import 
+    # from pacman import GameState
+    # walls = GameState.getWalls()
+
+    curr = state
+    visited.add(curr)
+    #print("Start: ", curr)
+    if problem.isGoalState(curr):
+        return [], True
+    else:
+        children = problem.expand(curr)
+        for i in children:
+            if i[0] not in visited:
+                fringe.push(i)
+        action = fringe.pop()
+        #print(action)
+        next = problem.getNextState(curr, action[1])
+        path, isPath = dfsHelper(problem, next, visited, fringe)
+        visited.add(next)
+        #print("Next: ", curr)
+        if isPath:
+            #print("Found path")
+            path.append(action[1])
+            return path, isPath    
+        else:
+            isPath = False
+            return [], isPath
+
+def dfsHelper2(problem, state, visited = set()):
+    curr = state
+    print("Curr ", curr)
+    visited.add(curr)
+    if problem.isGoalState(curr):
+        return [], True, visited
+    else:
+        children = problem.expand(curr)
+        nextup = []
+        for i in children:
+            if i[0] not in visited:
+                nextup.append(i)
+                visited.add(i[0])
+        for  i in nextup:
+            next = problem.getNextState(curr, i[1])
+            print("Action: ", i)
+            path, ispath, visited = dfsHelper2(problem, next, visited)
+            if ispath:
+                path.append(i[1])
+                return path, ispath, visited
+        return [], False, visited
+
+
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
