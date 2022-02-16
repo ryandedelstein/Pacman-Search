@@ -143,15 +143,10 @@ def dfsHelper(problem, state):
     
     while not fringe.isEmpty():
         curr, path = fringe.pop()
-        print("This is the path to get here")
-        print(path)
         if problem.isGoalState(curr):
-            print(path)
             return path, True
         children = problem.expand(curr)
         visited.append(curr)
-        print("These are already visited")
-        print(visited)
         for i in children:
             if i[0] not in visited:
                 fringe.push((i[0], path + [i[1]]))

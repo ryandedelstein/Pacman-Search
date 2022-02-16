@@ -299,7 +299,6 @@ class CornersProblem(search.SearchProblem):
         """
         
         self.walls = startingGameState.getWalls()
-        print(self.walls)
         self.startingPosition = startingGameState.getPacmanPosition()
         top, right = self.walls.height-2, self.walls.width-2
         self.corners = ((1,1), (1,top), (right, 1), (right, top))
@@ -327,11 +326,7 @@ class CornersProblem(search.SearchProblem):
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
-        if state[0] in self.corners:
-            print("CORNER")
-            print(len(state[1]))
-        #print(state)
-        #print()
+    
         return len(state[1]) == 0
 
     def expand(self, state):
@@ -347,16 +342,14 @@ class CornersProblem(search.SearchProblem):
         children = []
         if state[0] in state[1]:
             state[1].remove(state[0])
-        print()
-        print("State")
-        print(state)
+        # for i in range(4):
+        #     if state[1][i] == state[0]:
+        #         state[1][i] = (-1,-1)
         for action in self.getActions(state):
             nextState = self.getNextState(state, action)
             cost = self.getActionCost(state, action, nextState)
             #print(( nextState, action, cost))
             children.append( ( nextState, action, cost) )
-        print("Returns these children from expand")
-        print(children)
         
         self._expanded += 1 # DO NOT CHANGE
         return children
@@ -383,7 +376,7 @@ class CornersProblem(search.SearchProblem):
         x, y = state[0]
         dx, dy = Actions.directionToVector(action)
         nextx, nexty = int(x + dx), int(y + dy)
-        next_corners = state[1]
+        next_corners = state[1].copy()
         '''if (nextx,nexty) in next_corners:
             print("Corner Found")
             print(state)
