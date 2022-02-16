@@ -139,6 +139,7 @@ def dfsHelper(problem, state):
     children = problem.expand(curr)
     for i in children:
         if i[0] not in visited:
+            visited.append(i[0])
             fringe.push([i[0], [i[1]]])
     
     while not fringe.isEmpty():
@@ -146,9 +147,9 @@ def dfsHelper(problem, state):
         if problem.isGoalState(curr):
             return path, True
         children = problem.expand(curr)
-        visited.append(curr)
         for i in children:
             if i[0] not in visited:
+                visited.append(i[0])
                 fringe.push((i[0], path + [i[1]]))
                 
     
@@ -196,6 +197,7 @@ def bfsHelper(problem, state):
     for i in children:
         
         if i[0] not in visited:
+            visited.append(i[0])
             fringe.push([i[0], [i[1]]])
     
     while not fringe.isEmpty():
@@ -203,9 +205,9 @@ def bfsHelper(problem, state):
         if problem.isGoalState(curr):
             return path, True
         children = problem.expand(curr)
-        visited.append(curr)
         for i in children:
             if i[0] not in visited:
+                visited.append(i[0])
                 fringe.push((i[0], path + [i[1]]))
     
     return [], False
@@ -226,17 +228,17 @@ def aStarSearch(problem, heuristic=nullHeuristic):
 #Astar helper does work of A* search
 def aStarHelper(problem, state, h):
     curr = state
-    visited = set()
+    visited = []
     fringe = util.PriorityQueue()
-    visited.add(curr)
+    visited.append(curr)
     if problem.isGoalState(curr):
         return [], True
     
     children = problem.expand(curr)
     for i in children:
         if i[0] not in visited:
+            visited.append(i[0])
             fringe.push((i[0], [i[1]]), h(curr, problem))
-            visited.add(i[0])
     
     while not fringe.isEmpty():
         curr, path = fringe.pop()
@@ -245,8 +247,9 @@ def aStarHelper(problem, state, h):
         children = problem.expand(curr)
         for i in children:
             if i[0] not in visited:
+                visited.append(i[0])
                 fringe.push((i[0], path + [i[1]]), len(path) + h(curr, problem))
-                visited.add(i[0])
+
     
     return [], False
 
