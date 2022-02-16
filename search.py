@@ -130,9 +130,9 @@ def depthFirstSearch(problem):
 
 def dfsHelper(problem, state):
     curr = state
-    visited = set()
+    visited = []
     fringe = util.Stack()
-    visited.add(curr)
+    visited.append(curr)
     if problem.isGoalState(curr):
         return [], True
     
@@ -140,17 +140,22 @@ def dfsHelper(problem, state):
     for i in children:
         if i[0] not in visited:
             fringe.push([i[0], [i[1]]])
-            visited.add(i[0])
     
     while not fringe.isEmpty():
         curr, path = fringe.pop()
+        print("This is the path to get here")
+        print(path)
         if problem.isGoalState(curr):
+            print(path)
             return path, True
         children = problem.expand(curr)
+        visited.append(curr)
+        print("These are already visited")
+        print(visited)
         for i in children:
             if i[0] not in visited:
                 fringe.push((i[0], path + [i[1]]))
-                visited.add(i[0])
+                
     
     return [], False
 
@@ -182,29 +187,31 @@ def breadthFirstSearch(problem):
     return path
 
 #BFS helper function to do work of bfs
+
+
 def bfsHelper(problem, state):
     curr = state
-    visited = set()
+    visited = []
     fringe = util.Queue()
-    visited.add(curr)
+    visited.append(curr)
     if problem.isGoalState(curr):
         return [], True
     
     children = problem.expand(curr)
     for i in children:
+        
         if i[0] not in visited:
             fringe.push([i[0], [i[1]]])
-            visited.add(i[0])
     
     while not fringe.isEmpty():
         curr, path = fringe.pop()
         if problem.isGoalState(curr):
             return path, True
         children = problem.expand(curr)
+        visited.append(curr)
         for i in children:
             if i[0] not in visited:
                 fringe.push((i[0], path + [i[1]]))
-                visited.add(i[0])
     
     return [], False
 
