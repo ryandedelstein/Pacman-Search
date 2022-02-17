@@ -139,17 +139,16 @@ def dfsHelper(problem, state):
     children = problem.expand(curr)
     for i in children:
         if i[0] not in visited:
-            visited.append(i[0])
             fringe.push([i[0], [i[1]]])
     
     while not fringe.isEmpty():
         curr, path = fringe.pop()
+        visited.append(curr)
         if problem.isGoalState(curr):
             return path, True
         children = problem.expand(curr)
         for i in children:
             if i[0] not in visited:
-                visited.append(i[0])
                 fringe.push((i[0], path + [i[1]]))
                 
     
@@ -237,20 +236,24 @@ def aStarHelper(problem, state, h):
     children = problem.expand(curr)
     for i in children:
         if i[0] not in visited:
-            visited.append(i[0])
-            fringe.push((i[0], [i[1]]), h(curr, problem))
+            #visited.append(i[0])
+            fringe.push((i[0], [i[1]], i[2]), i[2] + h(i[0], problem))
     
     while not fringe.isEmpty():
-        curr, path = fringe.pop()
+        curr, path, cost = fringe.pop()
+        if curr in visited:
+            continue 
+        visited.append(curr)
         if problem.isGoalState(curr):
             return path, True
         children = problem.expand(curr)
         for i in children:
             if i[0] not in visited:
-                visited.append(i[0])
-                fringe.push((i[0], path + [i[1]]), len(path) + h(curr, problem))
-
-    
+                #visited.append(i[0])
+                #finge = ((x,y), path to get there , cost to get there)
+                fringe.push((i[0], path + [i[1]], cost + i[2]), cost + i[2] + h(i[0],problem))
+                
+                #fringe.push((i[0], (path + [i[1]], curr[1][1] + i[2])),  curr[1] + i[2] + h(curr, problem))
     return [], False
 
 # Abbreviations
