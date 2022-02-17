@@ -119,9 +119,10 @@ def depthFirstSearch(problem):
     s = Directions.SOUTH
     w = Directions.WEST
     e = Directions.EAST
-    print("Start: ", problem.getStartState())
+    #print("Start: ", problem.getStartState())
     #print("Is the start a goal? ", problem.isGoalState(problem.getStartState()))
 
+    # Using the dfs helper 
     path, isPath = dfsHelper(problem, problem.getStartState())
     #path.reverse()
     return path
@@ -129,25 +130,27 @@ def depthFirstSearch(problem):
 ## DFS Helper, does the work of DFS
 
 def dfsHelper(problem, state):
-    curr = state
-    visited = []
-    fringe = util.Stack()
-    visited.append(curr)
+    curr = state # Current State 
+    visited = [] # Visited Nodes 
+    fringe = util.Stack() # To be visited fringe 
+    visited.append(curr) # Add the start state to visited 
     if problem.isGoalState(curr):
         return [], True
     
+    # Get the children of the start and add them to the visited 
     children = problem.expand(curr)
     for i in children:
         if i[0] not in visited:
             fringe.push([i[0], [i[1]]])
     
+    # While the fringe is not empty (there are nodes to visit)
     while not fringe.isEmpty():
-        curr, path = fringe.pop()
-        visited.append(curr)
-        if problem.isGoalState(curr):
+        curr, path = fringe.pop() # Get the next node 
+        visited.append(curr) # Add the current node to visited 
+        if problem.isGoalState(curr): # If current is goal, return the path 
             return path, True
-        children = problem.expand(curr)
-        for i in children:
+        children = problem.expand(curr) # Else, expand the current node 
+        for i in children: # Add children to the stack if not visited 
             if i[0] not in visited:
                 fringe.push((i[0], path + [i[1]]))
                 
@@ -185,29 +188,30 @@ def breadthFirstSearch(problem):
 
 
 def bfsHelper(problem, state):
-    curr = state
-    visited = []
+    curr = state # Get the start state
+    visited = [] 
     fringe = util.Queue()
     visited.append(curr)
-    if problem.isGoalState(curr):
+    if problem.isGoalState(curr): 
         return [], True
     
+    # Get the children of the start and add to the fringe and visited 
     children = problem.expand(curr)
     for i in children:
-        
         if i[0] not in visited:
             visited.append(i[0])
             fringe.push([i[0], [i[1]]])
     
+    # For all nodes in the fringe 
     while not fringe.isEmpty():
-        curr, path = fringe.pop()
-        if problem.isGoalState(curr):
+        curr, path = fringe.pop() # Get the next node from the q
+        if problem.isGoalState(curr): # If goal, return path 
             return path, True
-        children = problem.expand(curr)
-        for i in children:
-            if i[0] not in visited:
-                visited.append(i[0])
-                fringe.push((i[0], path + [i[1]]))
+        children = problem.expand(curr) # Expand the current 
+        for i in children: 
+            if i[0] not in visited: # If child not already visited 
+                visited.append(i[0]) # Add to visited 
+                fringe.push((i[0], path + [i[1]])) # Push the x,y and cost to of child to fringe 
     
     return [], False
 
@@ -226,27 +230,30 @@ def aStarSearch(problem, heuristic=nullHeuristic):
 
 #Astar helper does work of A* search
 def aStarHelper(problem, state, h):
-    curr = state
+    curr = state # Start state 
     visited = []
     fringe = util.PriorityQueue()
-    visited.append(curr)
+    visited.append(curr) # Add the start to the pq
     if problem.isGoalState(curr):
         return [], True
     
-    children = problem.expand(curr)
+    children = problem.expand(curr) # Get children of start 
     for i in children:
         if i[0] not in visited:
             #visited.append(i[0])
+            # Append the children to the fringe 
+            # Adding ((x,y), path, cost to get there), heuristic
             fringe.push((i[0], [i[1]], i[2]), i[2] + h(i[0], problem))
     
+    # For all nodes in the fringe 
     while not fringe.isEmpty():
-        curr, path, cost = fringe.pop()
-        if curr in visited:
+        curr, path, cost = fringe.pop() # Current node 
+        if curr in visited: # If the node has already been visited, skip 
             continue 
-        visited.append(curr)
-        if problem.isGoalState(curr):
+        visited.append(curr) # Else add to the visited 
+        if problem.isGoalState(curr): # If goal, return path 
             return path, True
-        children = problem.expand(curr)
+        children = problem.expand(curr) # Get children of the current node 
         for i in children:
             if i[0] not in visited:
                 #visited.append(i[0])
@@ -257,6 +264,7 @@ def aStarHelper(problem, state, h):
     return [], False
 
 # Abbreviations
+# @Ryan do we need these? or can we comment them? 
 bfs = breadthFirstSearch
 dfs = depthFirstSearch
 astar = aStarSearch

@@ -310,7 +310,7 @@ class CornersProblem(search.SearchProblem):
         # in initializing the problem
         
         "*** YOUR CODE HERE ***"
-        self.visited = []
+        self.visited = [] 
         self.corners_list = list(self.corners)
 
     def getStartState(self):
@@ -319,6 +319,7 @@ class CornersProblem(search.SearchProblem):
         space)
         """
         "*** YOUR CODE HERE ***"
+        # Returns starting x,y and the list of corners 
         return (self.startingPosition, self.corners_list)
 
     def isGoalState(self, state):
@@ -326,10 +327,12 @@ class CornersProblem(search.SearchProblem):
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
+        # If the current state is a corner, remove it from the corners list in the state 
         if state[0] in state[1]:
             state[1].remove(state[0])
     
-        return len(state[1]) == 0
+        # If there are no more corners to visit
+        return len(state[1]) == 0 
 
     def expand(self, state):
         """
@@ -342,29 +345,35 @@ class CornersProblem(search.SearchProblem):
             is the incremental cost of expanding to that child
         """
         children = []
-        if state[0] in state[1]:
+        # If the state is a corner, remove from corner's list
+        if state[0] in state[1]:  
             state[1].remove(state[0])
-        # for i in range(4):
-        #     if state[1][i] == state[0]:
-        #         state[1][i] = (-1,-1)
+
+        # For all possible valid actions 
         for action in self.getActions(state):
-            nextState = self.getNextState(state, action)
-            cost = self.getActionCost(state, action, nextState)
-            #print(( nextState, action, cost))
-            children.append( ( nextState, action, cost) )
+            nextState = self.getNextState(state, action) # Get the next state from the action
+            cost = self.getActionCost(state, action, nextState) # Get the cost of the action
+            children.append( ( nextState, action, cost) ) # Add to children 
         
         self._expanded += 1 # DO NOT CHANGE
         return children
 
     def getActions(self, state):
+        # If the state is a goal, remove from goals list 
         if state[0] in state[1]:
             state[1].remove(state[0])
+
+    
         possible_directions = [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]
         valid_actions_from_state = []
+
+        # For each of the possible directions the agent can go 
         for action in possible_directions:
+            # Get the value of the next x and y 
             x, y = state[0]
             dx, dy = Actions.directionToVector(action)
             nextx, nexty = int(x + dx), int(y + dy)
+            # If it's not a wall, add it to the next possible actions 
             if not self.walls[nextx][nexty]:
                 valid_actions_from_state.append(action)
         return valid_actions_from_state
@@ -372,22 +381,22 @@ class CornersProblem(search.SearchProblem):
     def getActionCost(self, state, action, next_state):
         assert next_state == self.getNextState(state, action), (
             "Invalid next state passed to getActionCost().")
-        return 1
+        return 1 # Uniform cost 
 
     def getNextState(self, state, action):
+        # If the state is a goal, remove from the goal list 
         if state[0] in state[1]:
             state[1].remove(state[0])
+
         assert action in self.getActions(state), (
             "Invalid action passed to getActionCost().")
+        
+        # Get the current x and y 
         x, y = state[0]
         dx, dy = Actions.directionToVector(action)
         nextx, nexty = int(x + dx), int(y + dy)
         next_corners = state[1].copy()
-        '''if (nextx,nexty) in next_corners:
-            print("Corner Found")
-            print(state)
-            next_corners.remove((nextx,nexty))'''
-        return ((nextx, nexty),next_corners)
+        return ((nextx, nexty),next_corners) # Return the next x and y and corners remaining 
 
     def getCostOfActionSequence(self, actions):
         """
@@ -421,10 +430,9 @@ def cornersHeuristic(state, problem):
 
     if state[0] in state[1]:
         state[1].remove(state[0])
-    
 
     "*** YOUR CODE HERE ***"
-    #get manhattan distances:
+    # Get manhattan distances:
     dist = []
     for i in state[1]:
         if i == state[0]:
@@ -438,8 +446,9 @@ def cornersHeuristic(state, problem):
     #so clearly it is admissible
     return max(dist) #originally max # Default to trivial solution
 
-#gets manhattan distance from a to b where a, b  are coordinates
+# Gets manhattan distance from a to b where a, b  are coordinates
 def manhattan_dist(a,b):
+    # I mean, this is just algebra with the x and y corrdinates 
     return abs(a[0]-b[0]) + abs(a[1]-b[1])
 
 class AStarCornersAgent(SearchAgent):
@@ -557,7 +566,7 @@ def foodHeuristic(state, problem):
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
     dist = []
-    myList = foodGrid.asList()
+    myList = foodGrid.asList() # Keep track of the food left 
     maximum = 0
     pair = [(-1, 1), (-1,1)]
     '''
@@ -567,9 +576,12 @@ def foodHeuristic(state, problem):
             if manhattan_dist(i,j) > maximum:
                 maximum = manhattan_dist(i,j)
     '''
-    for i in myList:
-        for j in myList:
-            if manhattan_dist(i,j) > maximum:
+    # Find the largest distance between two foods 
+    for i in myList: # For the food in the list 
+        for j in myList: # For the food2 in the list 
+            # Calculate the mahattan distance between the two points 
+            # If it is the largest distance between the remaining food 
+            if manhattan_dist(i,j) > maximum: 
                 maximum = manhattan_dist(i,j)
                 pair = [i, j]
                 
@@ -579,9 +591,12 @@ def foodHeuristic(state, problem):
 
     if len(myList) == 0:
         return 0
-        
+    
+    # If there is only one food left, the distance is from current position to final goal
     if len(myList) == 1:
         return manhattan_dist(position, myList[0])
+
+    # Else, the distance is the smaller of the two farthest food points 
     p1dist = manhattan_dist(position, pair[0])
     p2dist = manhattan_dist(position, pair[1])
 
@@ -630,33 +645,29 @@ class ClosestDotSearchAgent(SearchAgent):
         curr = startPosition
         visited = []
         fringe = util.PriorityQueue()
-        visited.append(curr)
+        visited.append(curr) # Add start to visited 
         if problem.isGoalState(curr):
             return []
         
-        children = problem.expand(curr)
+        children = problem.expand(curr) # Get children of start 
         for i in children:
+            # If not visited, push (x,y), path, and cost of children to fringe 
             if i[0] not in visited:
-                #visited.append(i[0])
-                #mazeDistance(point1, point2, gameState)
                 fringe.push((i[0], [i[1]], i[2]), i[2]) 
         
+        # For all nodes in the fringe 
         while not fringe.isEmpty():
-            curr, path, cost = fringe.pop()
-            if curr in visited:
+            curr, path, cost = fringe.pop() # Get current node 
+            if curr in visited: # If we've already been to this node, SKIP! 
                 continue 
-            visited.append(curr)
-            if problem.isGoalState(curr):
+            visited.append(curr) # Add to visited if new node 
+            if problem.isGoalState(curr): # If it is a goal state, return the path 
                 return path
-            children = problem.expand(curr)
+            children = problem.expand(curr) # Get the children 
             for i in children:
                 if i[0] not in visited:
-                    #visited.append(i[0])
-                    #finge = ((x,y), path to get there , cost to get there)
-                    #fringe.push((i[0], path + [i[1]]), len(path) + 1+self.closest_dot_dist(i[0], food, gameState))
+                    # Push the (x,y), path, and cost of each child to the fringe if not visited 
                     fringe.push((i[0], path + [i[1]], i[2] + cost), i[2])
-                    
-                    #fringe.push((i[0], (path + [i[1]], curr[1][1] + i[2])),  curr[1] + i[2] + h(curr, problem))
         return []
 
 class AnyFoodSearchProblem(PositionSearchProblem):
@@ -693,8 +704,8 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         x,y = state
 
         "*** YOUR CODE HERE **#*"
-        #Check if the space is a food 
-        return self.food[x][y]
+        # Check if the space is a food 
+        return self.food[x][y] 
         
 
 def mazeDistance(point1, point2, gameState):
